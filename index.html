@@ -816,6 +816,170 @@
             });
         });
 
-        // 模拟数据
+        // 模拟数据 (completed for demonstration)
         const sampleData = [
-            { date: '2
+            { date: '2023-01-01', product: 'Product A', region: 'North', sales: 1200, quantity: 100 },
+            { date: '2023-01-02', product: 'Product B', region: 'South', sales: 800, quantity: 50 },
+            { date: '2023-01-03', product: 'Product A', region: 'East', sales: 1500, quantity: 120 },
+            { date: '2023-01-04', product: 'Product C', region: 'West', sales: 950, quantity: 70 },
+            { date: '2023-01-05', product: 'Product B', region: 'North', sales: 1100, quantity: 90 },
+            { date: '2023-01-06', product: 'Product A', region: 'South', sales: 700, quantity: 40 },
+            { date: '2023-01-07', product: 'Product C', region: 'East', sales: 1300, quantity: 110 },
+            { date: '2023-01-08', product: 'Product B', region: 'West', sales: 600, quantity: 30 },
+            { date: '2023-01-09', product: 'Product A', region: 'North', sales: 1800, quantity: 150 },
+            { date: '2023-01-10', product: 'Product C', region: 'South', sales: 1000, quantity: 80 }
+        ];
+
+        let currentData = [...sampleData]; // Data that will be processed
+
+        // Fix: Make upload area clickable and handle file selection
+        const uploadArea = document.getElementById('uploadArea');
+        const fileUpload = document.getElementById('fileUpload');
+        const dataPreviewSection = document.getElementById('dataPreview');
+        const cleaningSection = document.getElementById('cleaningSection');
+        const analysisSection = document.getElementById('analysisSection');
+        const visualizationSection = document.getElementById('visualizationSection');
+        const recommendationSection = document.getElementById('recommendationSection');
+
+
+        // When the upload area is clicked, trigger the hidden file input's click event
+        if (uploadArea && fileUpload) {
+            uploadArea.addEventListener('click', function() {
+                fileUpload.click();
+            });
+
+            // When a file is selected in the hidden input, handle it
+            fileUpload.addEventListener('change', function(event) {
+                const selectedFile = event.target.files[0];
+                if (selectedFile) {
+                    console.log('Selected file:', selectedFile.name);
+                    
+                    // Update the upload area text to show the file name
+                    const uploadAreaText = uploadArea.querySelector('h4');
+                    if (uploadAreaText) {
+                        uploadAreaText.textContent = `文件已选择: ${selectedFile.name}`;
+                    }
+                    const uploadAreaParagraph = uploadArea.querySelector('p');
+                    if (uploadAreaParagraph) {
+                        uploadAreaParagraph.textContent = `文件大小: ${(selectedFile.size / 1024).toFixed(2)} KB`;
+                    }
+
+                    // For demonstration, populate a dummy table row in data preview
+                    const previewTableBody = document.querySelector('#previewTable tbody');
+                    if (previewTableBody) {
+                        previewTableBody.innerHTML = `<tr><td>${new Date().toLocaleDateString()}</td><td>${selectedFile.name.split('.')[0]}</td><td>本地文件</td><td>N/A</td><td>N/A</td></tr>`;
+                    }
+
+                    // Show the next sections (cleaning, analysis, etc.)
+                    if (dataPreviewSection) dataPreviewSection.style.display = 'block';
+                    if (cleaningSection) cleaningSection.style.display = 'block';
+                    if (analysisSection) analysisSection.style.display = 'block';
+                    if (visualizationSection) visualizationSection.style.display = 'block';
+                    if (recommendationSection) recommendationSection.style.display = 'block';
+
+                    // In a real application, you would parse the file (e.g., using FileReader for CSV/Excel)
+                    // and then proceed with data processing.
+                    // Example for CSV:
+                    // const reader = new FileReader();
+                    // reader.onload = function(e) {
+                    //     const text = e.target.result;
+                    //     // Parse text as CSV and update currentData
+                    //     // currentData = parseCsv(text);
+                    //     console.log("File content (first 100 chars):", text.substring(0, 100));
+                    // };
+                    // reader.readAsText(selectedFile);
+
+                } else {
+                    console.log('No file selected.');
+                    // Optionally hide sections if no file is selected
+                    if (dataPreviewSection) dataPreviewSection.style.display = 'none';
+                    if (cleaningSection) cleaningSection.style.display = 'none';
+                    if (analysisSection) analysisSection.style.display = 'none';
+                    if (visualizationSection) visualizationSection.style.display = 'none';
+                    if (recommendationSection) recommendationSection.style.display = 'none';
+                    const uploadAreaText = uploadArea.querySelector('h4');
+                    if (uploadAreaText) {
+                        uploadAreaText.textContent = `拖放文件到此处或点击上传`;
+                    }
+                    const uploadAreaParagraph = uploadArea.querySelector('p');
+                    if (uploadAreaParagraph) {
+                        uploadAreaParagraph.textContent = `支持 CSV, Excel 文件`;
+                    }
+                }
+            });
+        }
+
+        // Placeholder for Echarts initialization and data processing
+        // This part would typically involve more complex logic based on actual data
+        // For now, it remains as per the original structure.
+
+        // Initialize Echarts (example, needs actual data integration)
+        let myChart = null; // Declare chart variable globally or manage scope
+
+        function initializeChart() {
+            if (!myChart) {
+                myChart = echarts.init(document.getElementById('chartContainer'));
+            }
+            // Default chart options (can be updated based on selected chartType, xAxis, yAxis)
+            const option = {
+                title: {
+                    text: '销售数据概览'
+                },
+                tooltip: {
+                    trigger: 'axis'
+                },
+                xAxis: {
+                    type: 'category',
+                    data: currentData.map(item => item.date)
+                },
+                yAxis: {
+                    type: 'value'
+                },
+                series: [{
+                    name: '销售额',
+                    type: 'line',
+                    data: currentData.map(item => item.sales)
+                }]
+            };
+            myChart.setOption(option);
+        }
+
+        // Event listener for "Generate Chart" button
+        document.getElementById('generateChart').addEventListener('click', function() {
+            initializeChart();
+        });
+
+        // Placeholder for data processing logic
+        document.getElementById('processData').addEventListener('click', function() {
+            alert('数据清洗与预处理功能待实现。');
+            // Here you would implement logic based on missingValueStrategy and outlierStrategy
+        });
+
+        // Placeholder for analysis logic
+        document.getElementById('runAnalysis').addEventListener('click', function() {
+            alert('数据分析功能待实现。');
+            // Here you would implement logic based on analysisType and modelType
+            // And display results in #analysisResults
+        });
+
+        // Placeholder for DB connection logic
+        document.getElementById('connectDb').addEventListener('click', function() {
+            alert('数据库连接功能待实现。');
+            // Here you would collect DB credentials and attempt connection
+        });
+
+        // Show/hide advanced analysis options
+        document.getElementById('analysisType').addEventListener('change', function() {
+            const advancedOptions = document.getElementById('advancedOptions');
+            if (this.value === 'advanced') {
+                advancedOptions.style.display = 'block';
+            } else {
+                advancedOptions.style.display = 'none';
+            }
+        });
+
+        // Initial chart rendering (optional, depends on whether you want a chart to show on load)
+        // initializeChart(); // Uncomment if you want a default chart on page load with sampleData
+    </script>
+</body>
+</html>
