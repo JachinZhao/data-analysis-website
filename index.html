@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PokeeData智能数据分析平台</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --accent: #4cc9f0;
+            --text: #333;
+            --light-bg: #f8f9fa;
+            --dark-bg: #212529;
+            --success: #4caf50;
+            --warning: #ff9800;
+            --danger: #f44336;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            color: var(--text);
+            background-color: var(--light-bg);
+            line-height: 1.6;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* 导航栏 */
+        .navbar {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 15px 0;
+        }
+        
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo span {
+            color: var(--secondary);
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+        
+        .nav-links li {
+            margin-left: 30px;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+        
+        .menu-toggle {
+            display: none;
+            cursor: pointer;
+            font-size: 24px;
+        }
+        
+        /* 英雄区域 */
+        .hero {
+            padding: 120px 0 80px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            text-align: center;
+        }
+        
+        .hero h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: var(--dark-bg);
+        }
+        
+        .hero p {
+            font-size: 20px;
+            max-width: 700px;
+            margin: 0 auto 40px;
+            color: #555;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: var(--primary);
+            color: white;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn:hover {
+            background-color: var(--secondary);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        /* 功能概述 */
+        .features {
+            padding: 80px 0;
+            background-color: white;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        
+        .section-title h2 {
+            font-size: 36px;
+            margin-bottom: 15px;
+            color: var(--dark-bg);
+        }
+        
+        .section-title p {
+            color: #666;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .feature-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        
+        .feature-card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            padding: 30px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        }
+        
+        .feature-icon {
+            font-size: 40px;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+        
+        .feature-card h3 {
+            font-size: 22px;
+            margin-bottom: 15px;
+        }
+        
+        /* 用户案例 */
+        .case-studies {
+            padding: 80px 0;
+            background-color: var(--light-bg);
+        }
+        
+        .case-card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .case-card h3 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+        
+        /* 分析部分 */
+        .analytics {
+            padding: 80px 0;
+            background-color: white;
+        }
+        
+        .analytics-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+        
+        .upload-section, .cleaning-section, .analysis-section, .visualization-section, .recommendation-section {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .section-header h3 {
+            font-size: 22px;
+            color: var(--dark-bg);
+        }
+        
+        .upload-area {
+            border: 2px dashed #ccc;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.3s;
+            margin-bottom: 20px;
+        }
+        
+        .upload-area:hover {
+            border-color: var(--primary);
+        }
+        
+        .upload-icon {
+            font-size: 48px;
+            color: #ccc;
+            margin-bottom: 15px;
+        }
+        
+        .db-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .data-table th, .data-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .data-table th {
+            background-color: var(--light-bg);
+            font-weight: 600;
+        }
+        
+        .data-table tbody tr:hover {
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+        
+        .chart-container {
+            height: 400px;
+            margin-top: 20px;
+        }
+        
+        .chart-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .select-wrapper {
+            position: relative;
+            min-width: 200px;
+        }
+        
+        select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            appearance: none;
+            background-color: white;
+            cursor: pointer;
+        }
+        
+        .select-wrapper::after {
+            content: '\25bc';
+            font-size: 12px;
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+        
+        .recommendation-card {
+            background-color: #f0f7ff;
+            border-left: 4px solid var(--primary);
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 5px;
+        }
+        
+        .recommendation-card h4 {
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+        
+        /* 关于我们 */
+        .about {
+            padding: 80px 0;
+            background-color: var(--light-bg);
+        }
+        
+        .about-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            align-items: center;
+        }
+        
+        .contact-form {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            padding: 30px;
+        }
+        
+        /* 页脚 */
+        .footer {
+            background-color: var(--dark-bg);
+            color: white;
+            padding: 50px 0 20px;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .footer-logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 15px;
+        }
+        
+        .footer h4 {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: white;
+        }
+        
+        .footer-links {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+        
+        .footer-links a {
+            color: #aaa;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer-links a:hover {
+            color: white;
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #444;
+            color: #aaa;
+            font-size: 14px;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 992px) {
+            .about-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: block;
+            }
+            
+            .nav-links {
+                position: fixed;
+                top: 70px;
+                left: -100%;
+                width: 100%;
+                height: calc(100vh - 70px);
+                background-color: white;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                transition: left 0.3s;
+            }
+            
+            .nav-links.active {
+                left: 0;
+            }
+            
+            .nav-links li {
+                margin: 15px 0;
+            }
+            
+            .hero h1 {
+                font-size: 36px;
+            }
+            
+            .hero p {
+                font-size: 18px;
+            }
+            
+            .db-form {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="#" class="logo">Pokee<span>Data</span></a>
+            <div class="menu-toggle">☰</div>
+            <ul class="nav-links">
+                <li><a href="#home">首页</a></li>
+                <li><a href="#analytics">开始分析</a></li>
+                <li><a href="#about">关于我们</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- 英雄区域 -->
+    <section id="home" class="hero">
+        <div class="container">
+            <h1>PokeeData - 洞察数据，驱动决策</h1>
+            <p>强大的数据分析平台，帮助您从复杂数据中提取有价值的见解，做出明智的业务决策</p>
+            <a href="#analytics" class="btn">立即开始分析</a>
+        </div>
+    </section>
+
+    <!-- 功能概述 -->
+    <section class="features">
+        <div class="container">
+            <div class="section-title">
+                <h2>强大功能，简单操作</h2>
+                <p>PokeeData提供全方位的数据分析工具，让您轻松处理和理解复杂数据</p>
+            </div>
+            <div class="feature-cards">
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>数据导入</h3>
+                    <p>支持多种数据源导入，包括CSV、Excel文件和数据库连接，轻松获取您需要分析的数据。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🧹</div>
+                    <h3>数据清洗</h3>
+                    <p>自动检测并处理缺失值、异常值，确保您的数据分析建立在干净、可靠的数据基础上。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔍</div>
+                    <h3>探索性分析</h3>
+                    <p>通过描述性统计和可视化工具，深入了解数据分布和关系，发现隐藏的模式。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📈</div>
+                    <h3>图表呈现</h3>
+                    <p>丰富的交互式图表类型，包括折线图、柱状图、饼图、散点图等，直观展示分析结果。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">💡</div>
+                    <h3>智能建议</h3>
+                    <p>基于数据分析结果，提供具体可行的业务决策建议，帮助您做出明智选择。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🚀</div>
+                    <h3>高级分析</h3>
+                    <p>支持线性回归、分类、聚类等高级分析模型，满足专业数据分析需求。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 用户案例 -->
+    <section class="case-studies">
+        <div class="container">
+            <div class="section-title">
+                <h2>成功案例</h2>
+                <p>看看其他企业如何利用PokeeData提升业务表现</p>
+            </div>
+            <div class="case-card">
+                <h3>某电商平台销售数据分析</h3>
+                <p>通过分析季度销售数据，发现了产品销售的季节性模式和客户购买行为，优化了库存管理和营销策略，使销售额提升了23%。</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 分析部分 -->
+    <section id="analytics" class="analytics">
+        <div class="container">
+            <div class="section-title">
+                <h2>开始您的数据分析</h2>
+                <p>上传数据，获取洞察，做出明智决策</p>
+            </div>
+            <div class="analytics-container">
+                <!-- 数据上传 -->
+                <div class="upload-section">
+                    <div class="section-header">
+                        <h3>1. 数据上传</h3>
+                    </div>
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-icon">📁</div>
+                        <h4>拖放文件到此处或点击上传</h4>
+                        <p>支持 CSV, Excel 文件</p>
+                        <input type="file" id="fileUpload" style="display: none;">
+                    </div>
+                    <div class="section-header">
+                        <h3>或连接数据库</h3>
+                    </div>
+                    <form class="db-form">
+                        <div class="form-group">
+                            <label for="dbHost">主机地址</label>
+                            <input type="text" id="dbHost" class="form-control" placeholder="例如: localhost">
+                        </div>
+                        <div class="form-group">
+                            <label for="dbPort">端口</label>
+                            <input type="text" id="dbPort" class="form-control" placeholder="例如: 3306">
+                        </div>
+                        <div class="form-group">
+                            <label for="dbUser">用户名</label>
+                            <input type="text" id="dbUser" class="form-control" placeholder="数据库用户名">
+                        </div>
+                        <div class="form-group">
+                            <label for="dbPass">密码</label>
+                            <input type="password" id="dbPass" class="form-control" placeholder="数据库密码">
+                        </div>
+                        <div class="form-group">
+                            <label for="dbName">数据库名</label>
+                            <input type="text" id="dbName" class="form-control" placeholder="数据库名称">
+                        </div>
+                        <div class="form-group">
+                            <button type="button" class="btn" id="connectDb">连接数据库</button>
+                        </div>
+                    </form>
+                    <div id="dataPreview" style="display: none;">
+                        <h4>数据预览</h4>
+                        <div class="table-responsive">
+                            <table class="data-table" id="previewTable">
+                                <thead>
+                                    <tr>
+                                        <th>日期</th>
+                                        <th>产品</th>
+                                        <th>地区</th>
+                                        <th>销售额</th>
+                                        <th>数量</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- 数据将通过JavaScript动态填充 -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 数据清洗 -->
+                <div class="cleaning-section" id="cleaningSection" style="display: none;">
+                    <div class="section-header">
+                        <h3>2. 数据清洗与预处理</h3>
+                    </div>
+                    <div class="form-group">
+                        <label>处理缺失值</label>
+                        <select class="form-control" id="missingValueStrategy">
+                            <option value="mean">填充均值</option>
+                            <option value="median">填充中位数</option>
+                            <option value="delete">删除含缺失值的行</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>处理异常值</label>
+                        <select class="form-control" id="outlierStrategy">
+                            <option value="iqr">IQR方法检测并移除</option>
+                            <option value="zscore">Z-Score方法检测并移除</option>
+                            <option value="none">不处理异常值</option>
+                        </select>
+                    </div>
+                    <button class="btn" id="processData">处理数据</button>
+                </div>
+
+                <!-- 数据分析 -->
+                <div class="analysis-section" id="analysisSection" style="display: none;">
+                    <div class="section-header">
+                        <h3>3. 数据分析</h3>
+                    </div>
+                    <div class="form-group">
+                        <label>选择分析类型</label>
+                        <select class="form-control" id="analysisType">
+                            <option value="descriptive">描述性统计</option>
+                            <option value="eda">探索性数据分析</option>
+                            <option value="advanced">高级分析</option>
+                        </select>
+                    </div>
+                    <div id="advancedOptions" style="display: none;">
+                        <div class="form-group">
+                            <label>选择分析模型</label>
+                            <select class="form-control" id="modelType">
+                                <option value="linear">线性回归</option>
+                                <option value="classification">分类</option>
+                                <option value="clustering">聚类</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="btn" id="runAnalysis">运行分析</button>
+                    <div id="analysisResults" style="display: none;">
+                        <h4>分析结果</h4>
+                        <div id="statsResults"></div>
+                    </div>
+                </div>
+
+                <!-- 图表呈现 -->
+                <div class="visualization-section" id="visualizationSection" style="display: none;">
+                    <div class="section-header">
+                        <h3>4. 图表呈现</h3>
+                    </div>
+                    <div class="chart-controls">
+                        <div class="select-wrapper">
+                            <select id="chartType">
+                                <option value="line">折线图</option>
+                                <option value="bar">柱状图</option>
+                                <option value="pie">饼图</option>
+                                <option value="scatter">散点图</option>
+                                <option value="heatmap">热力图</option>
+                            </select>
+                        </div>
+                        <div class="select-wrapper">
+                            <select id="xAxis">
+                                <option value="date">日期</option>
+                                <option value="product">产品</option>
+                                <option value="region">地区</option>
+                            </select>
+                        </div>
+                        <div class="select-wrapper">
+                            <select id="yAxis">
+                                <option value="sales">销售额</option>
+                                <option value="quantity">数量</option>
+                            </select>
+                        </div>
+                        <button class="btn" id="generateChart">生成图表</button>
+                    </div>
+                    <div id="chartContainer" class="chart-container"></div>
+                </div>
+
+                <!-- 决策建议 -->
+                <div class="recommendation-section" id="recommendationSection" style="display: none;">
+                    <div class="section-header">
+                        <h3>5. 智能决策建议</h3>
+                    </div>
+                    <div class="recommendation-card">
+                        <h4>销售策略建议</h4>
+                        <p>数据显示产品A在第三季度销售额显著增长，建议加大该产品的营销投入，特别是在北部地区。</p>
+                    </div>
+                    <div class="recommendation-card">
+                        <h4>库存优化建议</h4>
+                        <p>产品B在南部地区销售量持续下降，建议减少该地区的库存，将资源重新分配到表现更好的产品上。</p>
+                    </div>
+                    <div class="recommendation-card">
+                        <h4>客户洞察</h4>
+                        <p>分析显示高价值客户主要集中在东部地区，建议针对该地区开展客户忠诚度计划，提高客户留存率。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 关于我们 -->
+    <section id="about" class="about">
+        <div class="container">
+            <div class="section-title">
+                <h2>关于我们</h2>
+                <p>PokeeData致力于让数据分析变得简单而强大</p>
+            </div>
+            <div class="about-content">
+                <div>
+                    <h3>我们的愿景</h3>
+                    <p>PokeeData团队由一群热爱数据的专业人士组成，我们的使命是让数据分析变得简单易用，帮助企业和个人从数据中获取有价值的洞察。</p>
+                    <p>我们相信，在这个数据驱动的时代，每个组织都应该能够轻松利用数据的力量来做出更明智的决策。</p>
+                </div>
+                <div class="contact-form">
+                    <h3>联系我们</h3>
+                    <form>
+                        <div class="form-group">
+                            <label for="name">姓名</label>
+                            <input type="text" id="name" class="form-control" placeholder="您的姓名">
+                        </div>
+                        <div class="form-group">
+                            <label for="email">邮箱</label>
+                            <input type="email" id="email" class="form-control" placeholder="您的邮箱地址">
+                        </div>
+                        <div class="form-group">
+                            <label for="message">消息</label>
+                            <textarea id="message" class="form-control" rows="5" placeholder="请输入您的消息"></textarea>
+                        </div>
+                        <button type="submit" class="btn">发送消息</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div>
+                    <div class="footer-logo">PokeeData</div>
+                    <p>洞察数据，驱动决策</p>
+                </div>
+                <div>
+                    <h4>快速链接</h4>
+                    <ul class="footer-links">
+                        <li><a href="#home">首页</a></li>
+                        <li><a href="#analytics">开始分析</a></li>
+                        <li><a href="#about">关于我们</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>联系方式</h4>
+                    <p>邮箱: info@pokeedata.com</p>
+                    <p>电话: +86 123 4567 8910</p>
+                </div>
+            </div>
+            <div class="copyright">
+                &copy; 2023 PokeeData. 保留所有权利。
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 导航菜单切换
+        document.querySelector('.menu-toggle').addEventListener('click', function() {
+            document.querySelector('.nav-links').classList.toggle('active');
+        });
+
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // 模拟数据
+        const sampleData = [
+            { date: '2
